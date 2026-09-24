@@ -53,6 +53,32 @@ namespace NWSDB.Services.Controllers
             }
         }
 
+        // POST: api/nwsdbservice/pay/NWS-1001
+        [HttpPost("pay/{accountNumber}")]
+        public async Task<IActionResult> Pay(string accountNumber)
+        {
+            try
+            {
+                var account = await _context.WaterAccounts
+                    .FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
+
+                if (account == null)
+                {
+                    return NotFound(new { message = "Account not found." });
+                }
+
+                account.PaymentStatus = "Paid";
+                account.TotalDueAmount = 0;
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Payment successful!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Server error: " + ex.Message });
+            }
+        }
+
         // POST: api/nwsdbservice/register
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] User model)

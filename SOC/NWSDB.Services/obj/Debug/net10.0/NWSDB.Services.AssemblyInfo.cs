@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NWSDB.Services")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c08ddfe96a8d99fcca18da36a67e6a048a7e47a2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4fdb0594c4cc641ef73a5d83836db003cc874fe5")]
 [assembly: System.Reflection.AssemblyProductAttribute("NWSDB.Services")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NWSDB.Services")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -5,45 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NWSDB - Register</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-100 flex items-center justify-center h-screen">
-    <div class="bg-white p-8 rounded-lg shadow-md w-96">
-        <h1 class="text-2xl font-bold text-center text-blue-800 mb-6">Create Account</h1>
-        
-        <form id="registerForm" onsubmit="handleRegister(event)">
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Username</label>
-                <input type="text" id="regUsername" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Password</label>
-                <input type="password" id="regPassword" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
+<body>
+    <header class="site-header">
+        <div class="brand-inline"><span class="logo-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C12 2 5 10.2 5 15a7 7 0 0 0 14 0C19 10.2 12 2 12 2z"/></svg></span><div><strong>NWSDB</strong><small>Water Bill Service</small></div></div>
+        <nav>
+            <a href="login.html">Login</a>
+            <a href="register.html" class="active">Register</a>
+        </nav>
+    </header>
 
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Role</label>
-                <select id="regRole" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="Customer">Customer</option>
-                    <option value="Staff">Staff</option>
-                </select>
+    <main class="auth-main">
+        <div class="auth-card">
+            <h1>Create an account</h1>
+            <p class="sub">Register to view and pay your water bill.</p>
+
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="field">
+                    <label for="regUsername">Username</label>
+                    <input type="text" id="regUsername" required autocomplete="username" placeholder="Choose a username">
+                </div>
+
+                <div class="field">
+                    <label for="regPassword">Password</label>
+                    <div class="input-wrap">
+                        <input type="password" id="regPassword" class="has-toggle" required minlength="4" autocomplete="new-password" placeholder="At least 4 characters">
+                        <button type="button" class="toggle-pw" onclick="togglePassword('regPassword', this)" aria-label="Show or hide password">Show</button>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label id="roleLabel">Account type</label>
+                    <div class="role-picker" role="radiogroup" aria-labelledby="roleLabel">
+                        <input type="radio" name="regRole" id="roleCustomer" value="Customer" checked>
+                        <label for="roleCustomer">Customer</label>
+                        <input type="radio" name="regRole" id="roleStaff" value="Staff">
+                        <label for="roleStaff">Staff</label>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="regAccountNumber">Account number</label>
+                    <input type="text" id="regAccountNumber" required placeholder="e.g. NWS-1003">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Create account</button>
+            </form>
+
+            <p class="switch">Already registered? <a href="login.html">Sign in</a></p>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div>&copy; 2026 NWSDB &ndash; National Water Supply &amp; Drainage Board</div>
+            <div class="footer-links">
+                <span>Hotline: 1939</span>
+                <span>info@nwsdb.example</span>
+                <span>Mon&ndash;Fri, 8:30 am &ndash; 4:15 pm</span>
             </div>
-
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Account Number (e.g. NWS-1003)</label>
-                <input type="text" id="regAccountNumber" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">
-                Register
-            </button>
-        </form>
-
-        <p class="text-center text-sm text-gray-600 mt-4">
-            Already have an account? <a href="login.html" class="text-blue-500 hover:underline">Login here</a>
-        </p>
-    </div>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>

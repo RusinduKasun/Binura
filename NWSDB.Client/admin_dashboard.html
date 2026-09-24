@@ -4,117 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NWSDB - Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-slate-100 p-8">
-    <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <div class="flex justify-between items-center mb-6 border-b pb-4">
-            <div>
-                <h1 class="text-2xl font-bold text-blue-800">Admin Dashboard</h1>
-                <p id="userRoleDisplay" class="text-sm text-gray-600">Logged in as: Loading...</p>
+<body data-page="admin">
+    <header class="site-header">
+        <div class="brand-inline"><span class="logo-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C12 2 5 10.2 5 15a7 7 0 0 0 14 0C19 10.2 12 2 12 2z"/></svg></span><div><strong>NWSDB</strong><small>Water Bill Service</small></div></div>
+        <div class="header-user">
+            <span id="userRoleDisplay">Loading...</span>
+            <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1 class="page-title">Admin Dashboard</h1>
+        <p class="page-sub">Overview of all water accounts and payments.</p>
+
+        <section class="stats">
+            <div class="stat"><div class="lbl">Total accounts</div><div class="num" id="statTotal">-</div></div>
+            <div class="stat green"><div class="lbl">Paid</div><div class="num" id="statPaid">-</div></div>
+            <div class="stat red"><div class="lbl">Unpaid</div><div class="num" id="statUnpaid">-</div></div>
+            <div class="stat cyan"><div class="lbl">Outstanding</div><div class="num" id="statDue">-</div></div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2>Water Accounts</h2>
+                <div class="tools">
+                    <input type="search" id="searchBox" class="search" placeholder="Search name or account" aria-label="Search accounts" oninput="renderTable()">
+                    <select id="statusFilter" aria-label="Filter by status" class="filter" onchange="renderTable()">
+                        <option value="All">All statuses</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Unpaid">Unpaid</option>
+                    </select>
+                </div>
             </div>
-            <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-semibold transition">
-                Logout
-            </button>
-        </div>
-
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Water Accounts Management</h2>
-        
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-slate-200 text-slate-700 uppercase text-xs tracking-wider">
-                        <th class="p-3">Account No</th>
-                        <th class="p-3">Customer Name</th>
-                        <th class="p-3">Usage Units</th>
-                        <th class="p-3">Total Due (Rs.)</th>
-                        <th class="p-3">Status</th>
-                        <th class="p-3 text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="accountTableBody" class="divide-y divide-gray-200 text-sm">
-                    <tr><td colspan="6" class="text-center p-4 text-gray-500">Loading data...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- JavaScript with Smart Property Lookup & UI Fallbacks -->
-    <script>
-        const API_BASE_URL = "http://localhost:5067/api";
-
-        async function fetchWaterAccounts() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/nwsdbservice/accounts`);
-                if (!response.ok) throw new Error("Failed to fetch data from server");
-                const accounts = await response.json();
-
-                const tbody = document.getElementById("accountTableBody");
-                tbody.innerHTML = "";
-
-                if (accounts.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="text-center p-4 text-gray-500">No accounts found.</td></tr>`;
-                    return;
-                }
-
-                // Helper function for case-insensitive property lookup
-                const getProp = (obj, possibleNames) => {
-                    const foundKey = Object.keys(obj).find(k => 
-                        possibleNames.some(name => name.toLowerCase() === k.toLowerCase())
-                    );
-                    return foundKey ? obj[foundKey] : undefined;
-                };
-
-                accounts.forEach(acc => {
-                    console.log("Database Account Object:", acc);
-
-                    const accountNoVal = getProp(acc, ['accountNo', 'accountNumber', 'accNo', 'id']) || "N/A";
-                    const customerNameVal = getProp(acc, ['customerName', 'name', 'customer_name']) || "N/A";
-                    
-                    // Usage Units mapping (If 0 or undefined, fallback to 25 for testing display)
-                    const usageUnitsVal = getProp(acc, ['currentUsageUnits', 'usageUnits', 'units']) ?? 0;
-                    const totalDueVal = getProp(acc, ['totalDueAmount', 'totalDue', 'due']) ?? 0;
-                    const statusVal = getProp(acc, ['paymentStatus', 'status']) || "Unpaid";
-
-                    const statusClass = statusVal === "Paid" ? "text-green-600 font-semibold" : "text-red-600 font-semibold";
-                    const actionBtn = statusVal === "Paid" ? `<span class="text-gray-400">Completed</span>` : `<button onclick="payBill('${accountNoVal}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">Pay Now</button>`;
-
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 border-b">
-                            <td class="p-3 font-medium text-gray-800">${accountNoVal}</td>
-                            <td class="p-3 text-gray-600">${customerNameVal}</td>
-                            <td class="p-3 text-gray-600">${usageUnitsVal}</td>
-                            <td class="p-3 text-gray-600">Rs. ${Number(totalDueVal).toFixed(2)}</td>
-                            <td class="p-3 ${statusClass}">${statusVal}</td>
-                            <td class="p-3 text-center">${actionBtn}</td>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Account</th><th>Customer</th><th>Usage</th><th>Total due</th><th>Status</th><th class="text-right">Action</th>
                         </tr>
-                    `;
-                });
-            } catch (error) {
-                console.error("Error loading accounts:", error);
-                document.getElementById("accountTableBody").innerHTML = `<tr><td colspan="6" class="text-center p-4 text-red-500">Error connecting to backend server. Make sure API is running!</td></tr>`;
-            }
-        }
+                    </thead>
+                    <tbody id="accountTableBody">
+                        <tr><td colspan="6" class="center-msg"><div class="spinner"></div>Loading accounts...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 
-        function payBill(accountNo) {
-            alert(`Payment gateway simulated successfully for Account: ${accountNo}`);
-            location.reload();
-        }
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div>&copy; 2026 NWSDB &ndash; National Water Supply &amp; Drainage Board</div>
+            <div class="footer-links">
+                <span>Hotline: 1939</span>
+                <span>info@nwsdb.example</span>
+                <span>Mon&ndash;Fri, 8:30 am &ndash; 4:15 pm</span>
+            </div>
+        </div>
+    </footer>
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = "login.html";
-        }
-
-        window.addEventListener("DOMContentLoaded", () => {
-            const role = localStorage.getItem("userRole") || "User";
-            const username = localStorage.getItem("username") || "Guest";
-
-            if (document.getElementById("userRoleDisplay")) {
-                document.getElementById("userRoleDisplay").innerText = `Logged in as: ${username} (${role})`;
-                fetchWaterAccounts();
-            }
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

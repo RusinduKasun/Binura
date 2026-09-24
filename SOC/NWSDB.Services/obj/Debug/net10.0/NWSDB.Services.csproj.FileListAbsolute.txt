@@ -270,3 +270,4 @@ C:\Users\rusin\Desktop\New folder\Bill_Service\SOC\NWSDB.Services\obj\Debug\net1
 C:\Users\rusin\Desktop\New folder\Bill_Service\SOC\NWSDB.Services\obj\Debug\net10.0\NWSDB.Services.pdb
 C:\Users\rusin\Desktop\New folder\Bill_Service\SOC\NWSDB.Services\obj\Debug\net10.0\NWSDB.Services.genruntimeconfig.cache
 C:\Users\rusin\Desktop\New folder\Bill_Service\SOC\NWSDB.Services\obj\Debug\net10.0\ref\NWSDB.Services.dll
+C:\Users\rusin\Desktop\New folder\Bill_Service\SOC\NWSDB.Services\obj\Debug\net10.0\NWSDB.Services.sourcelink.json

@@ -1,148 +1,230 @@
-const API_BASE_URL = "http://localhost:5067/api";
+const API_BASE_URL = "http://localhost:5067/api/nwsdbservice";
 
-// Handle Login (Updated to nwsdbservice route)
-async function handleLogin(event) {
-    event.preventDefault();
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
+// ---------- helpers ----------
+function toast(message, type = "info") {
+    let box = document.getElementById("toasts");
+    if (!box) {
+        box = document.createElement("div");
+        box.id = "toasts";
+        document.body.appendChild(box);
+    }
+    const el = document.createElement("div");
+    el.className = `toast ${type}`;
+    el.textContent = message;
+    box.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+}
 
+async function api(path, method = "GET", body = null) {
+    let response;
     try {
-        const response = await fetch(`${API_BASE_URL}/nwsdbservice/login`, {
-            method: "POST",
+        response = await fetch(`${API_BASE_URL}${path}`, {
+            method,
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password })
+            body: body ? JSON.stringify(body) : undefined
         });
-        const data = await response.json();
-
-        if (response.ok) {
-            localStorage.setItem("username", data.username);
-            localStorage.setItem("userRole", data.role);
-            localStorage.setItem("accountNumber", data.accountNumber || "");
-
-            alert(`Login Successful! Welcome ${data.username}`);
-
-            if (data.role === "Staff" || data.username === "admin") {
-                window.location.href = "admin_dashboard.html";
-            } else {
-                window.location.href = "customer_portal.html";
-            }
-        } else {
-            alert(data.message || "Invalid credentials!");
-        }
-    } catch (error) {
-        console.error("Login error:", error);
-        alert("Could not connect to the backend server.");
+    } catch {
+        throw new Error("Cannot reach the server. Start the API (dotnet run) and try again.");
     }
+
+    let data = null;
+    try { data = await response.json(); } catch { /* empty body */ }
+
+    if (!response.ok) throw new Error((data && data.message) || `Request failed (${response.status})`);
+    return data;
 }
 
-// Handle Register (Updated to nwsdbservice route)
-async function handleRegister(event) {
-    event.preventDefault();
-    const username = document.getElementById("regUsername").value.trim();
-    const password = document.getElementById("regPassword").value.trim();
-    const role = document.getElementById("regRole").value;
-    const accountNumber = document.getElementById("regAccountNumber").value.trim();
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/nwsdbservice/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password, role, accountNumber })
-        });
-
-        let data;
-        try {
-            data = await response.json();
-        } catch (e) {
-            data = { message: "Registered successfully!" };
-        }
-
-        if (response.ok) {
-            alert("Registration successful! Please login.");
-            window.location.href = "login.html";
-        } else {
-            alert(data.message || "Registration failed!");
-        }
-    } catch (error) {
-        console.error("Register error:", error);
-        alert("Could not connect to the server.");
-    }
+function esc(value) {
+    const d = document.createElement("div");
+    d.textContent = value ?? "";
+    return d.innerHTML;
 }
 
-// Load Admin Dashboard Data (Matching nwsdbservice route)
-async function fetchWaterAccounts() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/nwsdbservice/accounts`);
-        if (!response.ok) throw new Error("Failed to fetch data from server");
-        const accounts = await response.json();
-
-        const tbody = document.getElementById("accountTableBody");
-        tbody.innerHTML = "";
-
-        if (accounts.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center p-4 text-gray-500">No accounts found.</td></tr>`;
-            return;
-        }
-
-        // Helper function for case-insensitive property lookup
-        const getProp = (obj, possibleNames) => {
-            const foundKey = Object.keys(obj).find(k => 
-                possibleNames.some(name => name.toLowerCase() === k.toLowerCase())
-            );
-            return foundKey ? obj[foundKey] : undefined;
-        };
-
-        accounts.forEach(acc => {
-            const accountNoVal = getProp(acc, ['accountNo', 'accountNumber', 'accNo', 'id']) || "N/A";
-            const customerNameVal = getProp(acc, ['customerName', 'name', 'customer_name']) || "N/A";
-            
-            const usageUnitsVal = getProp(acc, ['currentUsageUnits', 'usageUnits', 'units']) ?? 0;
-            const totalDueVal = getProp(acc, ['totalDueAmount', 'totalDue', 'due']) ?? 0;
-            const statusVal = getProp(acc, ['paymentStatus', 'status']) || "Unpaid";
-
-            const statusClass = statusVal === "Paid" ? "text-green-600 font-semibold" : "text-red-600 font-semibold";
-            const actionBtn = statusVal === "Paid" ? `<span class="text-gray-400">Completed</span>` : `<button onclick="payBill('${accountNoVal}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">Pay Now</button>`;
-
-            tbody.innerHTML += `
-                <tr class="hover:bg-slate-50 border-b">
-                    <td class="p-3 font-medium text-gray-800">${accountNoVal}</td>
-                    <td class="p-3 text-gray-600">${customerNameVal}</td>
-                    <td class="p-3 text-gray-600">${usageUnitsVal}</td>
-                    <td class="p-3 text-gray-600">Rs. ${Number(totalDueVal).toFixed(2)}</td>
-                    <td class="p-3 ${statusClass}">${statusVal}</td>
-                    <td class="p-3 text-center">${actionBtn}</td>
-                </tr>
-            `;
-        });
-    } catch (error) {
-        console.error("Fetch Error:", error);
-        document.getElementById("accountTableBody").innerHTML = `<tr><td colspan="6" class="text-center p-4 text-red-500">Error connecting to backend server. Make sure API is running!</td></tr>`;
-    }
+function money(n) {
+    return "Rs. " + Number(n || 0).toLocaleString("en-LK", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// Pay Bill Simulation
-function payBill(accountNo) {
-    alert(`Payment gateway simulated successfully for Account: ${accountNo}`);
-    location.reload();
+function badge(status) {
+    const paid = status === "Paid";
+    return `<span class="badge ${paid ? "paid" : "unpaid"}">${paid ? "Paid" : "Unpaid"}</span>`;
 }
 
-// Logout function
+function togglePassword(id, btn) {
+    const input = document.getElementById(id);
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    btn.textContent = show ? "Hide" : "Show";
+}
+
 function logout() {
     localStorage.clear();
     window.location.href = "login.html";
 }
 
-// Auto-run on page load depending on which page is open
+function requireLogin(allowedRole) {
+    const role = localStorage.getItem("userRole");
+    if (!role || (allowedRole && role !== allowedRole)) {
+        window.location.href = "login.html";
+        return false;
+    }
+    return true;
+}
+
+// ---------- login / register ----------
+async function handleLogin(event) {
+    event.preventDefault();
+    const btn = event.target.querySelector("button[type=submit]");
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    btn.disabled = true;
+    try {
+        const data = await api("/login", "POST", { username, password });
+        localStorage.setItem("username", data.username);
+        localStorage.setItem("userRole", data.role);
+        localStorage.setItem("accountNumber", data.accountNumber || "");
+
+        toast(`Welcome back, ${data.username}!`, "success");
+        setTimeout(() => {
+            window.location.href = data.role === "Staff" ? "admin_dashboard.html" : "customer_portal.html";
+        }, 600);
+    } catch (e) {
+        toast(e.message, "error");
+        btn.disabled = false;
+    }
+}
+
+async function handleRegister(event) {
+    event.preventDefault();
+    const btn = event.target.querySelector("button[type=submit]");
+    const username = document.getElementById("regUsername").value.trim();
+    const password = document.getElementById("regPassword").value;
+    const role = document.querySelector("input[name=regRole]:checked").value;
+    const accountNumber = document.getElementById("regAccountNumber").value.trim().toUpperCase();
+
+    btn.disabled = true;
+    try {
+        await api("/register", "POST", { username, password, role, accountNumber });
+        toast("Account created! Redirecting to login...", "success");
+        setTimeout(() => (window.location.href = "login.html"), 1200);
+    } catch (e) {
+        toast(e.message, "error");
+        btn.disabled = false;
+    }
+}
+
+// ---------- admin dashboard ----------
+let allAccounts = [];
+
+async function loadAdmin() {
+    if (!requireLogin("Staff")) return;
+    document.getElementById("userRoleDisplay").textContent =
+        `Signed in as ${localStorage.getItem("username")} (Staff)`;
+
+    try {
+        allAccounts = await api("/accounts");
+        renderStats();
+        renderTable();
+    } catch (e) {
+        document.getElementById("accountTableBody").innerHTML =
+            `<tr><td colspan="6" class="center-msg">${esc(e.message)}</td></tr>`;
+    }
+}
+
+function renderStats() {
+    const unpaid = allAccounts.filter(a => a.paymentStatus !== "Paid");
+    document.getElementById("statTotal").textContent = allAccounts.length;
+    document.getElementById("statPaid").textContent = allAccounts.length - unpaid.length;
+    document.getElementById("statUnpaid").textContent = unpaid.length;
+    document.getElementById("statDue").textContent = money(unpaid.reduce((s, a) => s + a.totalDueAmount, 0));
+}
+
+function renderTable() {
+    const q = document.getElementById("searchBox").value.trim().toLowerCase();
+    const f = document.getElementById("statusFilter").value;
+
+    const rows = allAccounts.filter(a =>
+        (f === "All" || a.paymentStatus === f) &&
+        (a.accountNumber.toLowerCase().includes(q) || a.customerName.toLowerCase().includes(q)));
+
+    const tbody = document.getElementById("accountTableBody");
+    if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="center-msg">No accounts match your search.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = rows.map(a => `
+        <tr>
+            <td class="acc-no">${esc(a.accountNumber)}</td>
+            <td>${esc(a.customerName)}</td>
+            <td>${a.currentUsageUnits} units</td>
+            <td>${money(a.totalDueAmount)}</td>
+            <td>${badge(a.paymentStatus)}</td>
+            <td class="text-right">${a.paymentStatus === "Paid"
+                ? `<span style="color:var(--muted)">Completed</span>`
+                : `<button class="btn btn-pay btn-sm" onclick="payBill('${esc(a.accountNumber)}', true)">Mark as Paid</button>`}</td>
+        </tr>`).join("");
+}
+
+// ---------- customer portal ----------
+async function loadCustomer() {
+    if (!requireLogin()) return;
+    const username = localStorage.getItem("username");
+    const accountNumber = localStorage.getItem("accountNumber");
+    document.getElementById("welcomeMessage").textContent = `Hello, ${username}!`;
+
+    const box = document.getElementById("billContainer");
+    if (!accountNumber) {
+        box.innerHTML = `<div class="center-msg">No account number is linked to your login.</div>`;
+        return;
+    }
+
+    try {
+        const a = await api(`/usage/${encodeURIComponent(accountNumber)}`);
+        const paid = a.paymentStatus === "Paid";
+        const pct = Math.min(100, Math.round((a.currentUsageUnits / 50) * 100));
+
+        box.innerHTML = `
+            <div class="bill">
+                <div class="bill-top">
+                    <small>Amount due</small>
+                    <div class="amount">${money(a.totalDueAmount)}</div>
+                    <small>Account ${esc(a.accountNumber)}</small>
+                    ${badge(a.paymentStatus)}
+                </div>
+                <div class="bill-rows">
+                    <div class="bill-row"><span>Customer</span><span>${esc(a.customerName)}</span></div>
+                    <div class="bill-row"><span>Units used</span><span>${a.currentUsageUnits} units</span></div>
+                    <div class="bill-row"><span>Status</span><span>${paid ? "Paid" : "Pending payment"}</span></div>
+                </div>
+                <div class="meter">
+                    <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
+                    <small>${pct}% of a 50-unit monthly band</small>
+                </div>
+                <div class="bill-foot">
+                    ${paid
+                        ? `<div class="paid-msg">Thank you. Your bill is fully paid.</div>`
+                        : `<button class="btn btn-pay" onclick="payBill('${esc(a.accountNumber)}', false)">Pay ${money(a.totalDueAmount)}</button>`}
+                </div>
+            </div>`;
+    } catch (e) {
+        box.innerHTML = `<div class="center-msg">${esc(e.message)}</div>`;
+    }
+}
+
+// ---------- shared: pay ----------
+async function payBill(accountNumber, isAdmin) {
+    try {
+        await api(`/pay/${encodeURIComponent(accountNumber)}`, "POST");
+        toast(`Payment recorded for ${accountNumber}`, "success");
+        if (isAdmin) loadAdmin(); else loadCustomer();
+    } catch (e) {
+        toast(e.message, "error");
+    }
+}
+
 window.addEventListener("DOMContentLoaded", () => {
-    const role = localStorage.getItem("userRole") || "User";
-    const username = localStorage.getItem("username") || "Guest";
-
-    if (document.getElementById("userRoleDisplay")) {
-        document.getElementById("userRoleDisplay").innerText = `Logged in as: ${username} (${role})`;
-        fetchWaterAccounts();
-    }
-
-    if (document.getElementById("customerWelcome")) {
-        document.getElementById("customerWelcome").innerText = `Welcome, ${username}! Account: ${localStorage.getItem("accountNumber") || "N/A"}`;
-    }
+    const page = document.body.dataset.page;
+    if (page === "admin") loadAdmin();
+    if (page === "customer") loadCustomer();
 });
