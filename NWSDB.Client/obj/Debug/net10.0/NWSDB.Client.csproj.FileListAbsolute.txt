@@ -1,0 +1,28 @@
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\bin\Debug\net10.0\NWSDB.Client.exe
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\bin\Debug\net10.0\NWSDB.Client.deps.json
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\bin\Debug\net10.0\NWSDB.Client.runtimeconfig.json
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\bin\Debug\net10.0\NWSDB.Client.dll
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\bin\Debug\net10.0\NWSDB.Client.pdb
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.AssemblyInfoInputs.cache
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.AssemblyInfo.cs
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.csproj.CoreCompileInputs.cache
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.dll
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\obj\Debug\net10.0\refint\NWSDB.Client.dll
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.pdb
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.genruntimeconfig.cache
+C:\Users\ASUS\Desktop\4'th sem\Client App\NWSDB.Client\obj\Debug\net10.0\ref\NWSDB.Client.dll
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\bin\Debug\net10.0\NWSDB.Client.exe
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\bin\Debug\net10.0\NWSDB.Client.deps.json
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\bin\Debug\net10.0\NWSDB.Client.runtimeconfig.json
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\bin\Debug\net10.0\NWSDB.Client.dll
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\bin\Debug\net10.0\NWSDB.Client.pdb
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.AssemblyInfoInputs.cache
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.AssemblyInfo.cs
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.csproj.CoreCompileInputs.cache
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.dll
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\obj\Debug\net10.0\refint\NWSDB.Client.dll
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.pdb
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\obj\Debug\net10.0\NWSDB.Client.genruntimeconfig.cache
+C:\Users\rusin\Desktop\New folder\Bill_Service\NWSDB.Client\obj\Debug\net10.0\ref\NWSDB.Client.dll

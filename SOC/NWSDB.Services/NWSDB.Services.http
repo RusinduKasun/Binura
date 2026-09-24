@@ -1,0 +1,11 @@
+@NWSDB.Services_HostAddress = http://localhost:5067
+
+GET {{NWSDB.Services_HostAddress}}/api/nwsdbservice/accounts
+Accept: application/json
+
+###
+
+GET {{NWSDB.Services_HostAddress}}/api/nwsdbservice/usage/NWS-1001
+Accept: application/json
+
+###
